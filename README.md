@@ -1,4 +1,7 @@
 # ukbeaver 🦫
+
+![ukbeaver mascot](assets/ukbeaver.png)
+
 **A lightweight toolkit for working with UK Biobank (UKB) tabular and imaging data**
 
 UK Biobank (UKB) provides one of the world’s largest biomedical datasets, containing extensive **tabular information** (phenotypes, biomarkers, questionnaires, etc.) and **imaging data** (MRI, retinal scans, X-rays, etc.). While rich in potential, accessing and organizing UKB data can be cumbersome due to its **complex file structures, field IDs, and modality-specific formats**.
