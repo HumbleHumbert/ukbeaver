@@ -27,19 +27,19 @@ pip install ukbeaver
 ### Minimal Example  
 
 ```python
-import ukbeaver as ub
+from ukbeaver.tabular import Phenotype
 
-# Load a tabular dataset
-df = ub.load_tabular("ukb12345.csv")
+# init with a UKB-style tab-delimited file
+ph = Phenotype("pheno_table.tsv")
 
-# Query specific fields by field ID
-subset = ub.query(df, fields=[50, 21001, 3063], instance=2)
+# load everything
+df, field_map = ph.get_df()
 
-# Load imaging data (e.g., brain MRI)
-mri_img = ub.load_image("ukb_mri/12345/T1.nii.gz")
+# select specific field IDs
+df_50, _ = ph.get_df(fids=["50"])
 
-print(subset.head())
-print(mri_img.shape)
+# select only instance 0
+df_i0, _ = ph.get_df(ins=0)
 ```
 
 ---
