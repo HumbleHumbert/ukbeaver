@@ -1,0 +1,19 @@
+[project]
+name = "ukbeaver"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "pandas>=2.3.3",
+    "polars>=1.35.1",
+    "requests>=2.32.5",
+]
+
+[dependency-groups]
+dev = [
+    "notebook>=7.4.7",
+    "pyarrow>=22.0.0",
+    "ruff>=0.14.4",
+]
+
