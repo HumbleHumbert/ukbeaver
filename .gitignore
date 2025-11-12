@@ -219,3 +219,6 @@ __marimo__/
 /data/
 /example/
 /doc/
+
+# Just ignore
+.idea/
