@@ -2,7 +2,7 @@ import polars as pl
 from polars import Int64, Float64, Utf8, Datetime, Categorical
 from pathlib import Path
 from collections import defaultdict
-from typing import Optional, Dict, Any, List
+from typing import Optional, Dict, Any, List, Tuple
 import os, re, requests
 import warnings
 from ukbeaver.util.schema import Schema
@@ -20,12 +20,14 @@ class Phenotype:
 
         self.pheno_table = pheno_table
 
-    def get_datatype(self) -> Dict[str, pl.DataType]:
+    def get_datatype(self) -> tuple[
+        (Dict[str, pl.DataType], List[str])
+    ]:
         # mapping value_type → Polars dtype (stays the same)
         value_type_map = {
             11: Int64,
-            21: Categorical,
-            22: Categorical,
+            21: Utf8,       # Choice
+            22: Utf8,       # Choice
             31: Float64,
             41: Utf8,
             51: Datetime,
@@ -56,14 +58,25 @@ class Phenotype:
         # always include eid
         dtype_map["eid"] = Utf8
 
-        return dtype_map
+        # prepare the Categorical
+        categorical_fields = [
+            n for n, v in zip(income_dtype_table['field_name'], income_dtype_table['value_type'])
+    if v in (21, 22)
+]
 
-    def get_df(self, fids: Optional[list[str]] = None, ins: Optional[str] = None) -> tuple[Any, dict[Any, Any]]:
+        return dtype_map, categorical_fields
+
+    def get_df(self, fids: Optional[list[str]] = None, ins: Optional[str] = None) -> tuple[pl.DataFrame, dict[Any, Any]]:
+
+        dtype_map, categorical_fields = self.get_datatype()
+        missing_strings = ['Do not know', 'Prefer not to answer', ]
+
         df = pl.scan_csv(
             self.pheno_table,
             separator="\t",
-            schema_overrides=self.get_datatype(),
+            schema_overrides=dtype_map,
             ignore_errors=True,
+            null_values=missing_strings
         )
 
         # Always keep eid
@@ -94,6 +107,12 @@ class Phenotype:
             filtered_cols.update(must_keep)  # ensure eid included
             if filtered_cols:
                 df = df.select(list(filtered_cols))
+
+        df = df.with_columns([
+            pl.col(col).cast(pl.Categorical(ordering="lexical"))
+            for col in categorical_fields
+        ])
+
 
         # get field id map
         field_map = defaultdict(list)

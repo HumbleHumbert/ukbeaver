@@ -1,4 +1,3 @@
-
 from pandas import DataFrame
 import polars as pl
 from polars import Int64, Float64, Utf8, Datetime, Categorical
@@ -58,10 +57,6 @@ class Category:
         }
 
         return seeker.get(title, 0)
-
-
-
-
 
     # Recursive descendant fetcher (all descendants: subcats + fields)
     def get_descendants(self, start_id: int) -> List[int]:

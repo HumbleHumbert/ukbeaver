@@ -1064,6 +1064,22 @@ wheels = [
 ]
 
 [[package]]
+name = "polars-ds"
+version = "0.10.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "polars" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/9d/52/f12bbb8999473024832e7a2590c0b17e4138fde69df7f42efdf46b7f96a5/polars_ds-0.10.2.tar.gz", hash = "sha256:8d801199b9b98f19c21e90524c4f84b94a691b017bcf58544de29ba0518574d9", size = 2087822, upload-time = "2025-09-21T18:41:20.97Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/5c/58/7c7c92b3f0d45bc08f856a9def4322c0825f4710549e02df9fa67eeacedc/polars_ds-0.10.2-cp39-abi3-macosx_10_12_x86_64.whl", hash = "sha256:0da88b8727b0b70666c259b5147b9f73d0b4d4ae69e5edce5e78a79bb19c797d", size = 14273663, upload-time = "2025-09-21T18:41:09.044Z" },
+    { url = "https://files.pythonhosted.org/packages/97/b1/7fc8e46b1a9fd40237495fdd3135741f747cf796756b938f62b87ad85d90/polars_ds-0.10.2-cp39-abi3-macosx_11_0_arm64.whl", hash = "sha256:0e1cf0a3b094b663f377829bf046375eeea4176fa33671c77929cff4dc42dd96", size = 12318062, upload-time = "2025-09-21T18:41:12.083Z" },
+    { url = "https://files.pythonhosted.org/packages/31/f9/d39684be7f8e112ec6000f06e99db1656c52157957d8b8b51d7e931c942a/polars_ds-0.10.2-cp39-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:f2df39da33a5d31fb6e293863d665e5f725922b1be2ee58f145e5ddedbe86ef9", size = 14760153, upload-time = "2025-09-21T18:41:14.716Z" },
+    { url = "https://files.pythonhosted.org/packages/7c/35/3fb6db43f9e3ccbf1becadc6872b763a2b5492f48378047f88373b762fce/polars_ds-0.10.2-cp39-abi3-manylinux_2_24_aarch64.whl", hash = "sha256:1c3aa5a38bcb77715fc2c77eabab79482c6786baaaacff5a3a9bd2e4b915b0ca", size = 12636866, upload-time = "2025-09-21T18:41:16.94Z" },
+    { url = "https://files.pythonhosted.org/packages/6d/29/f3a4f6515af80fba67a86b07be4a325b06501b1e30c78305c7c282e85b25/polars_ds-0.10.2-cp39-abi3-win_amd64.whl", hash = "sha256:2b573ac2db829227b9c87f1913d297c57ecae77aec9cef7fb8c60bc9bc591caa", size = 15664647, upload-time = "2025-09-21T18:41:18.996Z" },
+]
+
+[[package]]
 name = "polars-runtime-32"
 version = "1.35.1"
 source = { registry = "https://pypi.org/simple" }
@@ -1648,8 +1664,12 @@ dependencies = [
 [package.dev-dependencies]
 dev = [
     { name = "notebook" },
+    { name = "pandas" },
     { name = "pyarrow" },
     { name = "ruff" },
+]
+stat = [
+    { name = "polars-ds" },
 ]
 
 [package.metadata]
@@ -1662,9 +1682,11 @@ requires-dist = [
 [package.metadata.requires-dev]
 dev = [
     { name = "notebook", specifier = ">=7.4.7" },
+    { name = "pandas", specifier = ">=2.3.3" },
     { name = "pyarrow", specifier = ">=22.0.0" },
     { name = "ruff", specifier = ">=0.14.4" },
 ]
+stat = [{ name = "polars-ds", specifier = ">=0.10.2" }]
 
 [[package]]
 name = "uri-template"
