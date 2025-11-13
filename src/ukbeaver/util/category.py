@@ -10,22 +10,23 @@ import warnings
 from ukbeaver.util.schema import Schema
 
 class Category:
-    # def __init__(
-    #     self,
-    #     pheno_table: Path,
-    # ) -> None:
+    def __init__(
+        self,
+    ) -> None:
+        sa = Schema()
+
+        self.table_1 = sa.get_schema(1)
+        self.table_3 = sa.get_schema(3)
+        self.table_13 = sa.get_schema(13)
 
     # Make the dicrtory tree
-    def get_category(self):
-        table_13 = pl.read_csv(self.schema_13, separator='\t', encoding='latin1')
-        table_3 = pl.read_csv(self.schema_3, separator='\t', encoding='latin1')
-        table_1 = self.table_1
+    def get_tree(self):
 
         # Build the tree (adjacency list) from Table 1
         tree: defaultdict[int, list[int]]= defaultdict(list)
 
         t13_group = (
-            table_13
+            self.table_13
             .sort(['parent_id', 'showcase_order'])
             .group_by('parent_id', maintain_order=True)
             .agg(pl.col('child_id'))
@@ -36,7 +37,7 @@ class Category:
 
         # Group the field id
         t1_group = (
-            table_1
+            self.table_1
             .sort(['main_category'])
             .group_by('main_category', maintain_order=True)
             .agg(pl.col('field_id'))
@@ -49,15 +50,8 @@ class Category:
 
         return tree
 
-    # Step 3: Build title-to-id lookup (case-insensitive)
-    def build_title_lookup(df_cat: pl.DataFrame) -> Dict[str, int]:
-        return {
-            row["title"].lower(): int(row["category_id"])
-            for row in df_cat.select("category_id", pl.col("title").str.to_lowercase()).iter_rows(named=True)
-        }
-
-    # Step 4: Recursive descendant fetcher (all descendants: subcats + fields)
-    def get_descendants(tree: Dict[int, List[int]], start_id: int) -> List[int]:
+    # Recursive descendant fetcher (all descendants: subcats + fields)
+    def get_descendants(self, tree: Dict[int, List[int]], start_id: int) -> List[int]:
         descendants: List[int] = []
         def _walk(node: int):
             if node in tree:
@@ -68,7 +62,7 @@ class Category:
         return descendants
 
     # New: Step 5: Recursive field-only fetcher (only leaf fields in the subtree)
-    def get_fields_under_category(tree: Dict[int, List[int]], start_id: int) -> List[int]:
+    def get_fields_under_category(self, tree: Dict[int, List[int]], start_id: int) -> List[int]:
         fields: List[int] = []
         def _walk(node: int):
             if node in tree:
