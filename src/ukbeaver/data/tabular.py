@@ -5,7 +5,7 @@ from collections import defaultdict
 from typing import Optional, Dict, Any, List
 import os, re, requests
 import warnings
-from ukbeaver.util.schema import Schemas
+from ukbeaver.util.schema import Schema
 
 class Phenotype:
     def __init__(
@@ -13,10 +13,10 @@ class Phenotype:
         pheno_table: Path,
     ) -> None:
 
-        ss = Schemas()
-        self.table_1 = ss.get_schema(1)
-        self.table_3 = ss.get_schema(3)
-        self.table_13 = ss.get_schema(13)
+        sa = Schema()
+        self.table_1 = sa.get_schema(1)
+        self.table_3 = sa.get_schema(3)
+        self.table_13 = sa.get_schema(13)
 
         self.pheno_table = pheno_table
 

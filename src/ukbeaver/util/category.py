@@ -20,7 +20,7 @@ class Category:
         self.table_13 = sa.get_schema(13)
 
     # Make the dicrtory tree
-    def get_tree(self):
+    def get_tree(self) -> Dict[int, List[int]]:
 
         # Build the tree (adjacency list) from Table 1
         tree: defaultdict[int, list[int]]= defaultdict(list)
@@ -50,8 +50,23 @@ class Category:
 
         return tree
 
+
+    def title2id(self, title) -> int:
+        seeker =  {
+            row["title"].lower(): int(row["category_id"])
+            for row in self.table_3.select("category_id", pl.col("title").str.to_lowercase()).iter_rows(named=True)
+        }
+
+        return seeker.get(title, 0)
+
+
+
+
+
     # Recursive descendant fetcher (all descendants: subcats + fields)
-    def get_descendants(self, tree: Dict[int, List[int]], start_id: int) -> List[int]:
+    def get_descendants(self, start_id: int) -> List[int]:
+
+        tree = self.get_tree()
         descendants: List[int] = []
         def _walk(node: int):
             if node in tree:
@@ -62,7 +77,8 @@ class Category:
         return descendants
 
     # New: Step 5: Recursive field-only fetcher (only leaf fields in the subtree)
-    def get_fields_under_category(self, tree: Dict[int, List[int]], start_id: int) -> List[int]:
+    def get_fields_under_category(self, start_id: int) -> List[int]:
+        tree = self.get_tree()
         fields: List[int] = []
         def _walk(node: int):
             if node in tree:
