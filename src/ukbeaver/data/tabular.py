@@ -108,9 +108,12 @@ class Phenotype:
             if filtered_cols:
                 df = df.select(list(filtered_cols))
 
+        # fix the stupid category
+        current_cols = df.collect_schema().names()
         df = df.with_columns([
             pl.col(col).cast(pl.Categorical(ordering="lexical"))
             for col in categorical_fields
+            if col in current_cols
         ])
 
 
