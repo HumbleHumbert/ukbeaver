@@ -108,14 +108,14 @@ class Phenotype:
             if filtered_cols:
                 df = df.select(list(filtered_cols))
 
-        # fix the stupid category
-        current_cols = df.collect_schema().names()
-        df = df.with_columns([
-            pl.col(col).cast(pl.Categorical(ordering="lexical"))
-            for col in categorical_fields
-            if col in current_cols
-        ])
+        df = df.collect()
 
+        current_cols = set(df.columns)
+        for col in categorical_fields:
+            if col in current_cols:
+                df = df.with_columns(
+                    pl.col(col).cast(pl.Categorical)
+                )
 
         # get field id map
         field_map = defaultdict(list)
@@ -132,5 +132,5 @@ class Phenotype:
                 field_id = int(match.group(1))
                 field_map[field_id].append(col_name)
 
-        return df.collect(), dict(field_map)
+        return df, dict(field_map)
 
