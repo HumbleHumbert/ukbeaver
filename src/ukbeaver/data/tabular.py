@@ -26,8 +26,8 @@ class Phenotype:
         # mapping value_type → Polars dtype (stays the same)
         value_type_map = {
             11: Int64,
-            21: Utf8,       # Choice
-            22: Utf8,       # Choice
+            21: Categorical,       # Choice
+            22: Categorical,       # Choice
             31: Float64,
             41: Utf8,
             51: Datetime,
@@ -108,14 +108,6 @@ class Phenotype:
             if filtered_cols:
                 df = df.select(list(filtered_cols))
 
-        df = df.collect()
-
-        for col in categorical_fields:
-            if col in df.columns:
-                # Create fresh local categorical for this column ONLY
-                with pl.StringCache():  # Isolate cache per column
-                    df = df.with_columns(pl.col(col).cast(pl.Categorical))
-
         # get field id map
         field_map = defaultdict(list)
         # This regex captures the numeric part of the field ID
@@ -131,5 +123,26 @@ class Phenotype:
                 field_id = int(match.group(1))
                 field_map[field_id].append(col_name)
 
-        return df, dict(field_map)
+        return df.collect(), dict(field_map)
+
+    def get_dummies(self, df: pl.DataFrame):
+
+        cat_cols = [c for c,dtype in zip(df.columns, df.dtypes) if dtype == pl.Categorical]
+        df_dummies = df.to_dummies(columns=cat_cols, drop_nulls=True)
+
+        for col in cat_cols:
+            # Get all dummy columns for this categorical variable
+            dummy_cols = [
+                c for c in df_dummies.columns if c.startswith(f"{col}_")           ]
+            if dummy_cols:
+                # Sort alphabetically to ensure consistent selection
+                dummy_cols_sorted = sorted(dummy_cols)
+
+                # Drop the first dummy column (alphabetically)
+                col_to_drop = dummy_cols_sorted[0]
+                df_dummies = df_dummies.drop(col_to_drop)
+
+                print(f"Dropped first dummy for {col}: {col_to_drop}")
+
+        return df_dummies
 
