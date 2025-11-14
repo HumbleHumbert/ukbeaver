@@ -110,11 +110,11 @@ class Phenotype:
 
         df = df.collect()
 
-        df = df.with_columns(
-            pl.col(col).replace("null", None) for col in categorical_fields
-        )
         for col in categorical_fields:
-            df = df.with_columns(pl.col(col).cast(pl.Categorical))
+            if col in df.columns:
+                # Create fresh local categorical for this column ONLY
+                with pl.StringCache():  # Isolate cache per column
+                    df = df.with_columns(pl.col(col).cast(pl.Categorical))
 
         # get field id map
         field_map = defaultdict(list)
