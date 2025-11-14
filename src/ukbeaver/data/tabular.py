@@ -26,8 +26,8 @@ class Phenotype:
         # mapping value_type → Polars dtype (stays the same)
         value_type_map = {
             11: Int64,
-            21: Utf8,       # Choice
-            22: Utf8,       # Choice
+            21: Categorical,       # Choice
+            22: Categorical,       # Choice
             31: Float64,
             41: Utf8,
             51: Datetime,
@@ -107,15 +107,6 @@ class Phenotype:
             filtered_cols.update(must_keep)  # ensure eid included
             if filtered_cols:
                 df = df.select(list(filtered_cols))
-
-        # fix the stupid category
-        current_cols = df.collect_schema().names()
-        df = df.with_columns([
-            pl.col(col).cast(pl.Categorical(ordering="lexical"))
-            for col in categorical_fields
-            if col in current_cols
-        ])
-
 
         # get field id map
         field_map = defaultdict(list)
