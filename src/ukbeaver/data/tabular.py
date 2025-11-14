@@ -69,7 +69,7 @@ class Phenotype:
     def get_df(self, fids: Optional[list[str]] = None, ins: Optional[str] = None) -> tuple[pl.DataFrame, dict[Any, Any]]:
 
         dtype_map, categorical_fields = self.get_datatype()
-        missing_strings = ['Do not know', 'Prefer not to answer', ]
+        missing_strings = ['Do not know', 'Prefer not to answer', 'null']
 
         df = pl.scan_csv(
             self.pheno_table,
@@ -110,12 +110,11 @@ class Phenotype:
 
         df = df.collect()
 
-        current_cols = set(df.columns)
+        df = df.with_columns(
+            pl.col(col).replace("null", None) for col in categorical_fields
+        )
         for col in categorical_fields:
-            if col in current_cols:
-                df = df.with_columns(
-                    pl.col(col).cast(pl.Categorical)
-                )
+            df = df.with_columns(pl.col(col).cast(pl.Categorical))
 
         # get field id map
         field_map = defaultdict(list)
