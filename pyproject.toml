@@ -19,8 +19,6 @@ dev = [
 ]
 stat = [
     "polars-ds>=0.10.2",
-]
-stats = [
     "scikit-survival>=0.25.0",
 ]
 

@@ -1920,8 +1920,6 @@ dev = [
 ]
 stat = [
     { name = "polars-ds" },
-]
-stats = [
     { name = "scikit-survival" },
 ]
 
@@ -1939,8 +1937,10 @@ dev = [
     { name = "pyarrow", specifier = ">=22.0.0" },
     { name = "ruff", specifier = ">=0.14.4" },
 ]
-stat = [{ name = "polars-ds", specifier = ">=0.10.2" }]
-stats = [{ name = "scikit-survival", specifier = ">=0.25.0" }]
+stat = [
+    { name = "polars-ds", specifier = ">=0.10.2" },
+    { name = "scikit-survival", specifier = ">=0.25.0" },
+]
 
 [[package]]
 name = "uri-template"
