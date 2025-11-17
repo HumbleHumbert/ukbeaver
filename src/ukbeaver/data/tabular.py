@@ -56,7 +56,7 @@ class Phenotype:
         dtype_map = dict(zip(income_dtype_table['field_name'], dtype_list))
 
         # always include eid
-        dtype_map["eid"] = Utf8
+        dtype_map["eid"] = Int64
 
         # prepare the Categorical
         categorical_fields = [
@@ -142,7 +142,7 @@ class Phenotype:
                 col_to_drop = dummy_cols_sorted[0]
                 df_dummies = df_dummies.drop(col_to_drop)
 
-                print(f"Dropped first dummy for {col}: {col_to_drop}")
+                # print(f"Dropped first dummy for {col}: {col_to_drop}")
 
         return df_dummies
 
