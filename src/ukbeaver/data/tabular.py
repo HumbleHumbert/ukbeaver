@@ -1,5 +1,5 @@
 import polars as pl
-from polars import Int64, Float64, Utf8, Datetime, Categorical
+from polars import Int64, Float64, Utf8, Date, Categorical
 from pathlib import Path
 from collections import defaultdict
 from typing import Optional, Dict, Any, List, Tuple
@@ -30,7 +30,7 @@ class Phenotype:
             22: Categorical,       # Choice
             31: Float64,
             41: Utf8,
-            51: Datetime,
+            51: Date,
             61: Utf8,
             101: Utf8,
             201: Utf8,
@@ -146,3 +146,53 @@ class Phenotype:
 
         return df_dummies
 
+    def get_icd_dates(self,):
+        df, _ = self.get_df(fids=['41270', '41280'])
+
+        # --- Step A: Process the Dates (Unpivot) ---
+        q_dates = (
+            df.select(pl.col("eid"), pl.col("^p41280_a.*$")) # Select only EID and date cols
+            .unpivot(index="eid", variable_name="col_name", value_name="date")
+            .filter(pl.col("date").is_not_null()) # Remove empty dates to save memory
+            .with_columns(
+                # Extract the trailing number from 'p41280_a0' -> 0
+                pl.col("col_name").str.extract(r"(\d+)$").cast(pl.Int32).alias("idx")
+            )
+        )
+        print(q_dates.head())
+
+        # --- Step B: Process the ICD Codes (Explode) ---
+        q_codes = (
+            df.select(
+                pl.col("eid"),
+                pl.col("p41270").cast(pl.String)
+                .str.split("|")  # Split string into a list
+            )
+            .explode("p41270") # Turn list into rows
+            .with_columns(
+                # Create an index (0, 1, 2) for each code per user
+                pl.col("eid").cum_count().over("eid").alias("idx")
+            )
+            .with_columns(
+                # Clean the code: "B95.6 Staphylococcus" -> "B95.6"
+                pl.col("p41270")
+                .str.strip_chars()
+                .str.split(" ")
+                .list.get(0)
+                .alias("icd_code")
+            )
+        )
+        print(q_codes.head())
+
+        # --- Step C: Join and Pivot ---
+        final_df = (
+            q_codes.join(q_dates, on=["eid", "idx"])
+            .pivot(
+                on="icd_code",
+                index="eid",
+                values="date",
+                aggregate_function="first" # Use 'min' or 'first' if duplicates exist
+            )
+        )
+
+        return final_df
