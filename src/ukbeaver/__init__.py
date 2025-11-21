@@ -1,5 +1,11 @@
-# Optional: Define package version (or use __version__ from pyproject.toml if dynamic)
-__version__ = "0.1.0"  # Replace with your version
+import importlib.metadata
+
+try:
+    # Reads the version defined in pyproject.toml or git tag
+    __version__ = importlib.metadata.version("ukbeaver")
+except importlib.metadata.PackageNotFoundError:
+    __version__ = "unknown"
+
 
 # Expose subpackages or key modules for easy import
 from .data import imaging  # Assuming you want to expose functions from imaging.py

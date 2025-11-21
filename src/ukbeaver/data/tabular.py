@@ -159,7 +159,6 @@ class Phenotype:
                 pl.col("col_name").str.extract(r"(\d+)$").cast(pl.Int32).alias("idx")
             )
         )
-        print(q_dates.filter(pl.col('eid') == 1973934))
 
         # --- Step B: Process the ICD Codes (Explode) ---
         q_codes = (
@@ -182,7 +181,6 @@ class Phenotype:
                 .alias("icd_code")
             )
         )
-        print(q_codes.head(n=6))
 
         # --- Step C: Join and Pivot ---
         final_df = (

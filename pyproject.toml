@@ -1,12 +1,12 @@
 [project]
 name = "ukbeaver"
-version = "0.1.0"
+version = "0.3.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "pandas>=2.3.3",
-    "polars>=1.35.1",
+    "polars[plot]>=1.35.1",
     "requests>=2.32.5",
 ]
 
