@@ -5,7 +5,6 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "pandas>=2.3.3",
     "polars[plot]>=1.35.1",
     "requests>=2.32.5",
 ]
@@ -19,6 +18,9 @@ dev = [
 ]
 neuro = [
     "antspyx>=0.6.1",
+]
+plot = [
+    "rerun>=1.0.30",
 ]
 stat = [
     "polars-ds>=0.10.2",
