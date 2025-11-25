@@ -17,6 +17,9 @@ dev = [
     "pyarrow>=22.0.0",
     "ruff>=0.14.4",
 ]
+neuro = [
+    "antspyx>=0.6.1",
+]
 stat = [
     "polars-ds>=0.10.2",
     "scikit-survival>=0.25.0",
