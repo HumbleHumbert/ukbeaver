@@ -18,9 +18,11 @@ dev = [
 ]
 neuro = [
     "antspyx>=0.6.1",
+    "fslpy>=3.25.1",
+    "monai>=1.5.1",
 ]
 plot = [
-    "rerun>=1.0.30",
+    "rerun-sdk>=0.27.2",
 ]
 stat = [
     "polars-ds>=0.10.2",

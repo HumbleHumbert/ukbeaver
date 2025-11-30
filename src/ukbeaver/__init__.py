@@ -12,7 +12,8 @@ from .data import imaging  # Assuming you want to expose functions from imaging.
 from .data import tabular
 from .util import schema
 from .util import category
+from .util import atlas
 # If 'statis' has content, e.g., from .statis import some_function
 
 # Optional: Define __all__ to control what 'from ukbeaver import *' imports
-__all__ = ['imaging', 'tabular', 'schema', 'category']  # List public names here
+__all__ = ['imaging', 'tabular', 'schema', 'category', 'atlas']  # List public names here
