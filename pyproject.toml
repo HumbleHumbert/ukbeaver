@@ -1,6 +1,6 @@
 [project]
 name = "ukbeaver"
-version = "0.3.0"
+version = "0.3.1"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -20,6 +20,7 @@ neuro = [
     "antspyx>=0.6.1",
     "fslpy>=3.25.1",
     "monai>=1.5.1",
+    "torch>=2.9.1",
 ]
 plot = [
     "rerun-sdk>=0.27.2",

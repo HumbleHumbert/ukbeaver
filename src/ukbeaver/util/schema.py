@@ -10,7 +10,7 @@ class Schema:
         # Global cache dir
         cache_dir = Path.home() / ".ukbeaver"
         self.dict_path = cache_dir / "schemas"
-        self.dict_path.mkdir(exist_ok=True)
+        self.dict_path.mkdir(exist_ok=True, parents=True)
 
         urls = [
             "https://biobank.ndph.ox.ac.uk/ukb/scdown.cgi?fmt=txt&id=1",

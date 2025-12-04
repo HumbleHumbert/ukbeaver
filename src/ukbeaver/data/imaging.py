@@ -31,7 +31,7 @@ class Imaging:
         # We hash the path so we don't get filename conflicts
         path_hash = hashlib.md5(dir_path.encode('utf-8')).hexdigest()
         # You might want to keep a short alias in the name for debuggability
-        safe_name = Path(dir_path).name[-10:] 
+        safe_name = Path(dir_path).name[-10:]
         return self.buffer_path / f"cache_{safe_name}_{path_hash}.parquet"
 
     def _scan_directory(self, dir_path: str) -> pl.DataFrame:

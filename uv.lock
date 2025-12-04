@@ -2654,7 +2654,7 @@ wheels = [
 
 [[package]]
 name = "ukbeaver"
-version = "0.3.0"
+version = "0.3.1"
 source = { virtual = "." }
 dependencies = [
     { name = "polars", extra = ["plot"] },
@@ -2672,6 +2672,7 @@ neuro = [
     { name = "antspyx" },
     { name = "fslpy" },
     { name = "monai" },
+    { name = "torch" },
 ]
 plot = [
     { name = "rerun-sdk" },
@@ -2698,6 +2699,7 @@ neuro = [
     { name = "antspyx", specifier = ">=0.6.1" },
     { name = "fslpy", specifier = ">=3.25.1" },
     { name = "monai", specifier = ">=1.5.1" },
+    { name = "torch", specifier = ">=2.9.1" },
 ]
 plot = [{ name = "rerun-sdk", specifier = ">=0.27.2" }]
 stat = [
