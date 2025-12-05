@@ -15,6 +15,7 @@ dev = [
     "pandas>=2.3.3",
     "pyarrow>=22.0.0",
     "ruff>=0.14.4",
+    "snakemake>=9.14.1",
 ]
 neuro = [
     "antspyx>=0.6.1",

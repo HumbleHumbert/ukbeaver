@@ -6,7 +6,7 @@
 
 [![PyPI version](https://img.shields.io/pypi/v/ukbeaver.svg)](https://pypi.org/project/ukbeaver/)
 [![Python versions](https://img.shields.io/pypi/pyversions/ukbeaver.svg)](https://pypi.org/project/ukbeaver/)
-[![License](https://img.shields.io/pypi/l/ukbeaver.svg)](https://github.com/HumbleHumbert/ukbeaver/blob/main/LICENSE)
+[![License](https://img.shields.io/pypi/l/ukbeaver.svg)](https:yourusername//github.com/HumbleHumbert/ukbeaver/blob/main/LICENSE)
 
 UK Biobank (UKB) provides one of the world’s largest biomedical datasets, containing extensive **tabular information** (phenotypes, biomarkers, questionnaires) and **imaging data** (MRI, retinal scans, X-rays). While rich in potential, accessing and organizing UKB data can be cumbersome due to its **complex file structures, field IDs, and modality-specific formats**.
 
