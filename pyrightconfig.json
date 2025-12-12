@@ -1,0 +1,20 @@
+{
+  "include": ["src", "**/*.py"],
+  "exclude": ["**/node_modules", "**/__pycache__", "**/.*"],
+  "stubPath": "typings",
+  "venvPath": ".",
+  "venv": ".venv",
+
+  // "standard" is the industry default for modern Python projects
+  "typeCheckingMode": "standard",
+  "useLibraryCodeForTypes": true,
+
+  // Stop ignoring the important stuff
+  "reportMissingImports": "error",
+  "reportAttributeAccessIssue": "error",
+
+  // Relaxed rules for third-party libraries that lack types
+  "reportMissingTypeStubs": "warning",
+  "reportUnknownMemberType": "none",
+  "reportUnknownArgumentType": "none"
+}

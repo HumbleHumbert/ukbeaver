@@ -1,0 +1,34 @@
+[project]
+name = "ukbeaver"
+version = "0.3.2"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "polars[plot]>=1.35.1",
+    "requests>=2.32.5",
+]
+
+[dependency-groups]
+dev = [
+    "notebook>=7.4.7",
+    "pandas>=2.3.3",
+    "pyarrow>=22.0.0",
+    "ruff>=0.14.4",
+    "snakemake>=9.14.1",
+]
+neuro = [
+    "antspyx>=0.6.1",
+    "fslpy>=3.25.1",
+    "monai>=1.5.1",
+    "tensorboard>=2.20.0",
+    "torch>=2.9.1",
+]
+plot = [
+    "rerun-sdk>=0.27.2",
+]
+stat = [
+    "polars-ds>=0.10.2",
+    "scikit-survival>=0.25.0",
+]
+
