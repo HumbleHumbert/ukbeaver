@@ -19,6 +19,7 @@ dev = [
 ]
 neuro = [
     "antspyx>=0.6.1",
+    "captum>=0.7.0",
     "fslpy>=3.25.1",
     "monai>=1.5.1",
     "tensorboard>=2.20.0",
@@ -26,6 +27,9 @@ neuro = [
 ]
 plot = [
     "rerun-sdk>=0.27.2",
+]
+regis = [
+    "fmriprep-docker>=25.2.3",
 ]
 stat = [
     "polars-ds>=0.10.2",

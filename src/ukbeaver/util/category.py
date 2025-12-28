@@ -1,107 +1,101 @@
-from pandas import DataFrame
 import polars as pl
-from polars import Int64, Float64, Utf8, Datetime, Categorical
-from pathlib import Path
 from collections import defaultdict
-from typing import Optional, Dict, Any, List
-import os, re, requests
-import warnings
-from ukbeaver.util.schema import Schema
+from typing import Dict, List, Set
+
+# Assuming this exists as per your code
+from ukbeaver.util.schema import Schema 
 
 class Category:
-    def __init__(
-        self,
-    ) -> None:
+    def __init__(self) -> None:
         sa = Schema()
+        
+        # Load data eagerly
+        self.table_1 = sa.get_schema(1)   # Fields
+        self.table_3 = sa.get_schema(3)   # Categories (Descriptions)
+        self.table_13 = sa.get_schema(13) # Hierarchy
 
-        self.table_1 = sa.get_schema(1)
-        self.table_3 = sa.get_schema(3)
-        self.table_13 = sa.get_schema(13)
+        # --- Pre-compute Maps for O(1) Lookups ---
+        
+        # 1. Title Map (Lower case title -> Category ID)
+        # We drop nulls and convert to lowercase for case-insensitive lookup
+        self.title_map: Dict[str, int] = dict(
+            self.table_3.select(
+                pl.col("title").str.to_lowercase().alias("key"),
+                pl.col("category_id").alias("val")
+            ).drop_nulls().iter_rows()
+        )
 
-    # Make the dicrtory tree
-    def get_tree(self) -> Dict[int, List[int]]:
-
-        # Build the tree (adjacency list) from Table 1
-        tree: defaultdict[int, list[int]]= defaultdict(list)
-
-        t13_group = (
+        # 2. Subcategory Map (Parent Cat ID -> List of Child Cat IDs)
+        # Explicitly cast to Int64 to ensure Python int compatibility
+        t13_agg = (
             self.table_13
             .sort(['parent_id', 'showcase_order'])
-            .group_by('parent_id', maintain_order=True)
-            .agg(pl.col('child_id'))
+            .group_by("parent_id")
+            .agg(pl.col("child_id"))
+        )
+        # Convert to python dict {int: list[int]}
+        self.subcategory_map: Dict[int, List[int]] = dict(
+            zip(t13_agg["parent_id"].to_list(), t13_agg["child_id"].to_list())
         )
 
-        for parent, child in zip (t13_group['parent_id'], t13_group['child_id']):
-            tree[int(parent)].extend([int(c) for c in child])
-
-        # Group the field id
-        t1_group = (
+        # 3. Field Map (Category ID -> List of Field IDs)
+        # This keeps fields separate from categories to avoid ID collisions
+        t1_agg = (
             self.table_1
-            .sort(['main_category'])
-            .group_by('main_category', maintain_order=True)
-            .agg(pl.col('field_id'))
+            .group_by("main_category")
+            .agg(pl.col("field_id"))
+        )
+        self.field_map: Dict[int, List[int]] = dict(
+            zip(t1_agg["main_category"].to_list(), t1_agg["field_id"].to_list())
         )
 
-        for category, fields in zip(t1_group['main_category'], t1_group['field_id']):
-            cat_id = int(category)
-            field_list = [int(f) for f in fields]
-            tree[cat_id].extend(field_list)
+    def get_id_by_title(self, title: str) -> int:
+        """Returns category ID for a given title (case-insensitive). Returns -1 if not found."""
+        return self.title_map.get(title.lower(), -1)
 
-        return tree
+    def get_descendant_categories(self, start_id: int) -> List[int]:
+        """
+        Returns a list of all sub-category IDs under the start_id (recursive),
+        INCLUDING the start_id itself.
+        """
+        # If the category doesn't strictly exist in our tree, return just itself 
+        # (it might be a leaf category with no children)
+        visited: List[int] = []
+        stack: List[int] = [start_id]
+        
+        # Iterative DFS is generally safer than recursion for very deep trees (avoids recursion limit)
+        while stack:
+            current_id = stack.pop()
+            visited.append(current_id)
+            
+            # If this category has children, add them to the stack
+            if current_id in self.subcategory_map:
+                # Extend in reverse order so they pop in correct order (optional, purely for traversal order)
+                children = self.subcategory_map[current_id]
+                stack.extend(reversed(children))
+                
+        return visited
 
-
-    def title2id(self, title) -> int:
-        seeker =  {
-            row["title"].lower(): int(row["category_id"])
-            for row in self.table_3.select("category_id", pl.col("title").str.to_lowercase()).iter_rows(named=True)
-        }
-
-        return seeker.get(title, 0)
-
-    # Recursive descendant fetcher (all descendants: subcats + fields)
-    def get_descendants(self, start_id: int) -> List[int]:
-
-        tree = self.get_tree()
-        descendants: List[int] = []
-        def _walk(node: int):
-            if node in tree:
-                for child in tree[node]:
-                    descendants.append(child)
-                    _walk(child)  # Recurse for deeper levels
-        _walk(start_id)
-        return descendants
-
-    # New: Step 5: Recursive field-only fetcher (only leaf fields in the subtree)
     def get_fields_under_category(self, start_id: int) -> List[int]:
-        tree = self.get_tree()
-        fields: List[int] = []
-        def _walk(node: int):
-            if node in tree:
-                for child in tree[node]:
-                    if child not in tree:  # Leaf check: if no entry in tree, it's a field (no children)
-                        fields.append(child)
-                    else:
-                        _walk(child)  # Recurse only if it's a subcategory
-        _walk(start_id)
-        return fields
+        """
+        Returns ALL field IDs under a category and all its sub-categories.
+        """
+        all_fields: List[int] = []
+        
+        # 1. Get the category and all its sub-categories
+        relevant_categories = self.get_descendant_categories(start_id)
+        
+        # 2. Collect fields for each of those categories
+        for cat_id in relevant_categories:
+            if cat_id in self.field_map:
+                all_fields.extend(self.field_map[cat_id])
+                
+        return all_fields
 
-    # Step 6: Query helpers (title -> results)
-    def get_all_ids_under_title(
-        title: str, title_to_id: Dict[str, int], tree: Dict[int, List[int]]
-    ) -> List[int]:
-        title_lower = title.lower()
-        start_id = title_to_id.get(title_lower)
-        if start_id is None:
+    def get_fields_by_title(self, title: str) -> List[int]:
+        """Helper to go directly from Title string -> List of Field IDs"""
+        cat_id = self.get_id_by_title(title)
+        if cat_id == -1:
+            print(f"Warning: Category '{title}' not found.")
             return []
-        return get_descendants(tree, start_id)
-
-    def get_fields_under_title(
-        title: str, title_to_id: Dict[str, int], tree: Dict[int, List[int]]
-    ) -> List[int]:
-        title_lower = title.lower()
-        start_id = title_to_id.get(title_lower)
-        if start_id is None:
-            return []
-        return get_fields_under_category(tree, start_id)
-
-
+        return self.get_fields_under_category(cat_id)
